@@ -1,0 +1,13 @@
+PODS:
+  - ActiveLabel (0.7.0)
+  - Alamofire (4.0.1)
+
+DEPENDENCIES:
+  - ActiveLabel
+  - Alamofire
+
+SPEC CHECKSUMS:
+  ActiveLabel: eb405c5b99275be52fac161f7a55cab1dd672c54
+  Alamofire: 7682d43245de14874acd142ec137b144aa1dd335
+
+COCOAPODS: 0.39.0
