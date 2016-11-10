@@ -6,6 +6,6 @@ Environment:
 
 - Xcode 8.0
 - Swift 3.0
-- Deployment tagret: iOS 10+
+- Deployment Target: iOS 10+
 - Cocoapods have been used to manage dependancies for this project, so if you find any errors related to pods then run 
 "pod install" command in terminal.
