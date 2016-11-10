@@ -17,17 +17,29 @@ class TweetsViewController: UIViewController {
     let cellIdentifier = "cell"
     let estimatedRowHeight:CGFloat = 100
     let appTintColor = UIColor(colorLiteralRed: 0, green: 153.0/255.0, blue: 229.0/255.0, alpha: 1.0)
+    let offlineStatusTitle = "The Internet connection appears to be offline"
+    let offlineStatusMessage = "Connect to internet and try again"
+    let welcomeStatusTitle = "Welcome to Noon twitter demo"
+    let welcomeStatusMessage = "What do you want to search today"
+    let emptyResultTitle = "Twitter couldn't find anything for your search"
+    let emptyResultMessage = "Try searching something else"
+    
+    
+    
+    
     
     // MARK: Properties
     
     let tweetViewModel = TweetViewModel()
-    
     @IBOutlet var settingsButton: UIBarButtonItem!
     @IBOutlet var tableView: UITableView!
     @IBOutlet var searchBar: UISearchBar!
     var refreshControl = UIRefreshControl()
     var bottomActivity = UIActivityIndicatorView()
     var newTweetLabel = UILabel()
+    var isPulledRefrsed = Bool()
+    
+    
     
     
     
@@ -39,6 +51,8 @@ class TweetsViewController: UIViewController {
         tweetViewModel.delegate = self
         setupUI()
     }
+    
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -46,15 +60,7 @@ class TweetsViewController: UIViewController {
     }
     
 
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
     //MARK: UI Methods
     
@@ -97,7 +103,11 @@ class TweetsViewController: UIViewController {
         button.addTarget(self, action: #selector(scrollToTop), for: UIControlEvents.touchDown)
         self.navigationController?.navigationBar.addSubview(button)
         
+        updateTableHeaderWith(title: welcomeStatusTitle, message: welcomeStatusMessage)
     }
+    
+    
+    
     
     
     func showNewTweetsLabel() -> Void {
@@ -119,7 +129,7 @@ class TweetsViewController: UIViewController {
         
         
      
-        if !isNewTweetsVisible() && !tableView.isDragging{
+        if !isNewTweetsVisible() && !tableView.isDragging && !searchBar.isFirstResponder{
  
             UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.curveEaseIn, animations: {
                 
@@ -131,6 +141,8 @@ class TweetsViewController: UIViewController {
     }
     
     
+    
+    
     func hideNewTweetsLabel() -> Void {
         
         UIView.animate(withDuration: 1.0, delay: 0.8, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.curveEaseIn, animations: {
@@ -139,6 +151,8 @@ class TweetsViewController: UIViewController {
             
             }, completion: nil)
     }
+    
+    
     
     func isNewTweetsVisible() -> Bool {
         
@@ -150,10 +164,14 @@ class TweetsViewController: UIViewController {
     }
     
     
+    
+    
     func showBottomRefresh() -> Void {
         bottomActivity.startAnimating()
         tableView.tableFooterView = bottomActivity
     }
+    
+    
     
     
     func hideBottomRefresh() -> Void {
@@ -162,6 +180,41 @@ class TweetsViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         
     }
+    
+    
+    
+    
+    func updateTableHeaderWith(title:String, message:String) -> Void{
+        
+        let statusView = UIView(frame: CGRect(x: 0, y: 0, width: searchBar.bounds.width - 15, height: 50))
+        statusView.center.x = searchBar.bounds.width/2.0
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: statusView.frame.width, height: 25))
+        titleLabel.text = title
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
+        titleLabel.textAlignment = NSTextAlignment.center
+        titleLabel.adjustsFontSizeToFitWidth = true
+        
+        let subTitleLabel = UILabel(frame: CGRect(x: 0, y: 22, width: statusView.frame.width, height: 20))
+        subTitleLabel.text = message
+        subTitleLabel.font = UIFont.systemFont(ofSize: 14)
+        subTitleLabel.textAlignment = NSTextAlignment.center
+        subTitleLabel.adjustsFontSizeToFitWidth = true
+        subTitleLabel.textColor = UIColor.lightGray
+        
+        
+        statusView.addSubview(titleLabel)
+        statusView.addSubview(subTitleLabel)
+        
+        tableView.tableHeaderView = statusView
+    }
+    
+    
+    
+    func hideTableHeaderStatusMessage() -> Void {
+        tableView.tableHeaderView = nil
+    }
+    
+    
     
     
     //MARK: Button Actions
@@ -216,8 +269,11 @@ class TweetsViewController: UIViewController {
     //MARK: Update Methods
     
     func pulledToRefresh() -> Void {
+        isPulledRefrsed = true
         tweetViewModel.fetchNewTweetsForCurrentQuery()
     }
+    
+    
     
     func newTweetsLabelTapped() -> Void {
         
@@ -225,31 +281,58 @@ class TweetsViewController: UIViewController {
         hideNewTweetsLabel()
     }
     
+    
+    
     func scrollToTop() -> Void {
         if tableView.numberOfRows(inSection: 0) > 0{
             tableView.scrollToRow(at: NSIndexPath(row: 0, section: 0) as IndexPath, at: UITableViewScrollPosition.top, animated: true)
         }
     }
     
+    
+    
 }
 
 
 extension TweetsViewController: UISearchBarDelegate{
     
+
+    
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         
+        
+    }
+    
+    
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        searchBar.showsCancelButton = false
+        hideNewTweetsLabel()
+        searchBar.resignFirstResponder()
+        
         if searchBar.text != "" {
-            
+            tweetViewModel.sharedAppDelegate.tweets.removeAll()
+            tableView.reloadData()
             tableView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.size.height), animated: true)
             refreshControl.beginRefreshing()
-
             tweetViewModel.searchTwitterFor(query: searchBar.text!)
         }
     }
-
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    
+    
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = true
+    }
+    
+    
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
         searchBar.resignFirstResponder()
     }
+    
 }
 
 extension TweetsViewController: UITableViewDelegate, UITableViewDataSource{
@@ -259,6 +342,8 @@ extension TweetsViewController: UITableViewDelegate, UITableViewDataSource{
         
         return tweetViewModel.sharedAppDelegate.tweets.count
     }
+    
+    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -328,15 +413,21 @@ extension TweetsViewController: UITableViewDelegate, UITableViewDataSource{
     }
     
     
+    
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    
     
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
         return UITableViewAutomaticDimension
     }
+    
+    
     
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -348,11 +439,7 @@ extension TweetsViewController: UITableViewDelegate, UITableViewDataSource{
     }
     
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
- 
-    }
-    
+
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         
@@ -361,6 +448,7 @@ extension TweetsViewController: UITableViewDelegate, UITableViewDataSource{
         }
     }
     
+    
 }
 
 
@@ -368,29 +456,52 @@ extension TweetsViewController: TweetViewModelDelegate{
     
     func didFinishSearchingWithError(error: AnyObject?) {
         
-        refreshControl.endRefreshing()
-        hideBottomRefresh()
-        self.tableView.reloadData()
+        if error?.code == NSURLErrorNotConnectedToInternet{
+            
+            updateTableHeaderWith(title: offlineStatusTitle, message: offlineStatusMessage)
+        }else{
+            refreshControl.endRefreshing()
+            hideBottomRefresh()
+            hideTableHeaderStatusMessage()
+            self.tableView.reloadData()
+            if tweetViewModel.sharedAppDelegate.tweets.count == 0{
+                updateTableHeaderWith(title: emptyResultTitle, message: emptyResultMessage)
+            }
+        }
+        
     }
+    
+    
     
     func didFinishFetchingNextTweetsWithError(error: AnyObject?) {
         
-        refreshControl.endRefreshing()
-        hideBottomRefresh()
-        self.tableView.reloadData()
+        if error?.code == NSURLErrorNotConnectedToInternet{
+            
+            updateTableHeaderWith(title: offlineStatusTitle, message: offlineStatusMessage)
+        }else{
+            refreshControl.endRefreshing()
+            hideBottomRefresh()
+            hideTableHeaderStatusMessage()
+            self.tableView.reloadData()
+            if tweetViewModel.sharedAppDelegate.tweets.count == 0{
+                updateTableHeaderWith(title: emptyResultTitle, message: emptyResultMessage)
+            }
+        }
+        
     }
+    
+    
     
     func newTweetsAvailable(available: Bool) {
         
-        if available{
+        if available && !isPulledRefrsed{
             print("New Tweets Available")
             showNewTweetsLabel()
-            refreshControl.endRefreshing()
-    
-            
         }else{
-            refreshControl.endRefreshing()
+            isPulledRefrsed = false
+            tableView.reloadData()
         }
+        refreshControl.endRefreshing()
         
     }
     

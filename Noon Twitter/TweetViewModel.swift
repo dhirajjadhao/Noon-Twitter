@@ -11,12 +11,14 @@ import Alamofire
 import AlamofireImage
 import ObjectMapper
 
+
 //MARK: Enum Declaration
 
 enum fetchError: String {
     case NoRefreshTweetsURL = "Refresh URL Not available"
     case NoNextTweetsURL = "Next Result URL Not available"
 }
+
 
 
 enum refreshStatus: String {
@@ -26,6 +28,7 @@ enum refreshStatus: String {
     case thirtySec = "30 Seconds"
     case oneMin = "1 Minute"
 }
+
 
 
 protocol TweetViewModelDelegate {
@@ -38,28 +41,25 @@ protocol TweetViewModelDelegate {
 
 class TweetViewModel: NSObject {
   
+    
     //MARK: Constants
     
     let baseURL = "https://api.twitter.com/1.1"
     let tweetCountPerPage = 20
-    
     let twitterBearerToken = "AAAAAAAAAAAAAAAAAAAAAB12xwAAAAAA1rKfX7wszEa5%2F1HsUH0UqT8A3NI%3DEsfROSafMTG23Pxf3BzlY02zijN286fG4UZODIL819ATDojTQv"
-    
     let createdOnDateFormat = "EEE MMM dd HH:mm:ss Z yyyy"
     
 
+    
+    
     //MARK: Properties
     
     var delegate: TweetViewModelDelegate?
-    
     let sharedAppDelegate = UIApplication.shared.delegate as! AppDelegate
-    
     var tweetsNextResultURL: String?
     var tweetsRefreshURL: String?
-    
     var currentRefreshStatus = refreshStatus.fiveSec
     var autoRefreshTimer = Timer()
-    
     private var tweet:Tweet?
     
     var nameText: String? {
@@ -174,10 +174,14 @@ class TweetViewModel: NSObject {
         
     }
     
+    
+    
     func disableAutoRefresh() -> Void {
         
         autoRefreshTimer.invalidate()
     }
+    
+    
     
     func refreshStatusToTimeInterval(status: refreshStatus) -> TimeInterval {
         
@@ -195,6 +199,8 @@ class TweetViewModel: NSObject {
         }
         
     }
+    
+    
     
     
     //MARK: Networking
@@ -228,10 +234,6 @@ class TweetViewModel: NSObject {
                         self.tweetsNextResultURL = searchMetadata.object(forKey: "next_results") as? String
                         self.tweetsRefreshURL = searchMetadata.object(forKey: "refresh_url") as? String
                         
-                        if self.tweetsNextResultURL == nil{
-                            self.searchTwitterFor(query: query)
-                            return
-                        }
                         
                         self.addSearchedTweets(result: responseObject["statuses"] as! NSArray)
                         self.enableAutoRefresh()
@@ -377,6 +379,8 @@ class TweetViewModel: NSObject {
   
     }
     
+    
+    
     func addSearchedTweets(result: NSArray) -> Void {
         
         for i in 0 ..< result.count{
@@ -395,6 +399,8 @@ class TweetViewModel: NSObject {
     }
     
     
+    
+    
     func clearAllPreviousQueryData() -> Void{
         
         sharedAppDelegate.tweets.removeAll()
@@ -403,18 +409,25 @@ class TweetViewModel: NSObject {
     }
     
     
+    
+    
     //MARK: Delegate Methods
     
     func didFinishSearchingWithError(error:AnyObject?) -> Void {
         delegate?.didFinishSearchingWithError(error: error)
     }
     
+    
+    
     func newTweetsAvailable(available:Bool) -> Void{
         delegate?.newTweetsAvailable(available: available)
     }
     
+    
+    
     func didFinishFetchingNextTweetsWithError(error:AnyObject?) -> Void{
         delegate?.didFinishFetchingNextTweetsWithError(error: error)
     }
+    
     
 }

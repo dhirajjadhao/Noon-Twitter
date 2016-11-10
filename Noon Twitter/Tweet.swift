@@ -41,11 +41,10 @@ class Tweet: Mappable {
     }
     
     
+    
     //MARK: Mapping
     
-    public required init?(map: Map) {
-        
-    }
+    public required init?(map: Map) {}
     
     func mapping(map: Map) {
         
