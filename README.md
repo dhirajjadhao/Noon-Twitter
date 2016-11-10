@@ -11,4 +11,6 @@ This is a demo app to show working of Twitter Search API written in Swift 3.0. A
 
 ## Screenshots:
 
+![screenshot1](https://cloud.githubusercontent.com/assets/2684979/20190076/f7d290ec-a7a5-11e6-82c0-74cb161bc389.png) ![screenshot2](https://cloud.githubusercontent.com/assets/2684979/20190073/f7813166-a7a5-11e6-939b-f63ba8178b9f.png) ![screenshot3](https://cloud.githubusercontent.com/assets/2684979/20190075/f7d1effc-a7a5-11e6-9f32-1246bfa59392.png) 
+
 
