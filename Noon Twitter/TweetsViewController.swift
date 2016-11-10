@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PMAlertController
 import SafariServices
 
 class TweetsViewController: UIViewController {
