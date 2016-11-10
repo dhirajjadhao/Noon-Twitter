@@ -36,7 +36,7 @@ class TweetsViewController: UIViewController {
     @IBOutlet var searchBar: UISearchBar!
     var refreshControl = UIRefreshControl()
     var bottomActivity = UIActivityIndicatorView()
-    var newTweetLabel = UILabel()
+    var newTweetButton = UIButton()
     var isPulledRefrsed = Bool()
     
     
@@ -75,21 +75,18 @@ class TweetsViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         
         
-        newTweetLabel = UILabel(frame: CGRect(x: 0, y: -50, width: 110, height: 30))
-        newTweetLabel.backgroundColor = appTintColor
-        newTweetLabel.layer.cornerRadius = 14
-        newTweetLabel.layer.masksToBounds = true
-        newTweetLabel.center.x = self.view.frame.width/2.0
-        newTweetLabel.textAlignment = NSTextAlignment.center
-        newTweetLabel.text = "↑ New Tweets"
-        newTweetLabel.textColor = UIColor.white
-        newTweetLabel.font = UIFont.systemFont(ofSize: 12.5)
-        newTweetLabel.isUserInteractionEnabled = true
+        newTweetButton = UIButton(frame: CGRect(x: 0, y: -50, width: 110, height: 30))
+        newTweetButton.backgroundColor = appTintColor
+        newTweetButton.layer.cornerRadius = 14
+        newTweetButton.layer.masksToBounds = true
+        newTweetButton.center.x = self.view.frame.width/2.0
+        newTweetButton.titleLabel?.textAlignment = NSTextAlignment.center
+        newTweetButton.setTitle("↑ New Tweets", for: UIControlState.normal)
+        newTweetButton.setTitleColor(UIColor.white, for: UIControlState.normal)
+        newTweetButton.titleLabel?.font = UIFont.systemFont(ofSize: 12.5)
+        newTweetButton.addTarget(self, action: #selector(newTweetsButtonTapped), for: UIControlEvents.touchDown)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(newTweetsLabelTapped))
-        newTweetLabel.addGestureRecognizer(tapGesture)
-        
-        self.view.addSubview(newTweetLabel)
+        self.view.addSubview(newTweetButton)
         
         bottomActivity = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
         bottomActivity.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
@@ -133,7 +130,7 @@ class TweetsViewController: UIViewController {
  
             UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.curveEaseIn, animations: {
                 
-                self.newTweetLabel.frame.origin.y = 50
+                self.newTweetButton.frame.origin.y = 50
                 
                 }, completion: nil)
         }
@@ -143,11 +140,11 @@ class TweetsViewController: UIViewController {
     
     
     
-    func hideNewTweetsLabel() -> Void {
+    func hideNewTweetsButton() -> Void {
         
-        UIView.animate(withDuration: 1.0, delay: 0.8, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.curveEaseIn, animations: {
+        UIView.animate(withDuration: 1.0, delay: 0.4, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: UIViewAnimationOptions.curveEaseIn, animations: {
             
-            self.newTweetLabel.frame.origin.y = -50
+            self.newTweetButton.frame.origin.y = -50
             
             }, completion: nil)
     }
@@ -156,7 +153,7 @@ class TweetsViewController: UIViewController {
     
     func isNewTweetsVisible() -> Bool {
         
-        if newTweetLabel.frame.origin.y == 50 {
+        if newTweetButton.frame.origin.y == 50 {
             return true
         }else{
             return false
@@ -275,10 +272,10 @@ class TweetsViewController: UIViewController {
     
     
     
-    func newTweetsLabelTapped() -> Void {
+    func newTweetsButtonTapped() -> Void {
         
         scrollToTop()
-        hideNewTweetsLabel()
+        hideNewTweetsButton()
     }
     
     
@@ -308,7 +305,7 @@ extension TweetsViewController: UISearchBarDelegate{
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         searchBar.showsCancelButton = false
-        hideNewTweetsLabel()
+        hideNewTweetsButton()
         searchBar.resignFirstResponder()
         
         if searchBar.text != "" {
@@ -444,7 +441,7 @@ extension TweetsViewController: UITableViewDelegate, UITableViewDataSource{
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         
         if isNewTweetsVisible(){
-            hideNewTweetsLabel()
+            hideNewTweetsButton()
         }
     }
     
