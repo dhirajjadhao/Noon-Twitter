@@ -6,6 +6,8 @@ target ‘Noon Twitter’ do
 
 pod 'Alamofire'
 pod 'ActiveLabel'
+pod 'AlamofireObjectMapper', '~> 4.0'
+pod 'AlamofireImage', '~> 3.1'
 
 end
 

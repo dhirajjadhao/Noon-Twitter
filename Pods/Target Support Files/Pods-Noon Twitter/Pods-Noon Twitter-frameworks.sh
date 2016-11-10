@@ -86,8 +86,14 @@ strip_invalid_archs() {
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "Pods-Noon Twitter/ActiveLabel.framework"
   install_framework "Pods-Noon Twitter/Alamofire.framework"
+  install_framework "Pods-Noon Twitter/AlamofireImage.framework"
+  install_framework "Pods-Noon Twitter/AlamofireObjectMapper.framework"
+  install_framework "Pods-Noon Twitter/ObjectMapper.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "Pods-Noon Twitter/ActiveLabel.framework"
   install_framework "Pods-Noon Twitter/Alamofire.framework"
+  install_framework "Pods-Noon Twitter/AlamofireImage.framework"
+  install_framework "Pods-Noon Twitter/AlamofireObjectMapper.framework"
+  install_framework "Pods-Noon Twitter/ObjectMapper.framework"
 fi
