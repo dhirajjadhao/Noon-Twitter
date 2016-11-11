@@ -231,9 +231,8 @@ class TweetViewModel: NSObject {
                         let responseObject = response.result.value as! NSDictionary
                         let searchMetadata = responseObject["search_metadata"] as! NSDictionary
                         
-                        self.tweetsNextResultURL = searchMetadata.object(forKey: "next_results") as? String
                         self.tweetsRefreshURL = searchMetadata.object(forKey: "refresh_url") as? String
-                        
+                        self.tweetsNextResultURL = searchMetadata.object(forKey: "next_results") as? String
                         
                         self.addSearchedTweets(result: responseObject["statuses"] as! NSArray)
                         self.enableAutoRefresh()
@@ -276,8 +275,8 @@ class TweetViewModel: NSObject {
                         
                         let searchMetadata = responseObject["search_metadata"] as! NSDictionary
                         
+                        //self.tweetsRefreshURL = searchMetadata.object(forKey: "refresh_url") as? String
                         self.tweetsNextResultURL = searchMetadata.object(forKey: "next_results") as? String
-                        self.tweetsRefreshURL = searchMetadata.object(forKey: "refresh_url") as? String
                         
                         self.addSearchedTweets(result: responseObject["statuses"] as! NSArray)
                         
@@ -329,6 +328,7 @@ class TweetViewModel: NSObject {
                         let searchMetadata = responseObject["search_metadata"] as! NSDictionary
                         
                         self.tweetsRefreshURL = searchMetadata.object(forKey: "refresh_url") as? String
+                        //self.tweetsNextResultURL = searchMetadata.object(forKey: "next_results") as? String
                         
                         self.updateTweetsWithNew(result: responseObject["statuses"] as! NSArray)
                         

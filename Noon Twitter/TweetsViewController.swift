@@ -22,6 +22,8 @@ class TweetsViewController: UIViewController {
     let welcomeStatusMessage = "What do you want to search today"
     let emptyResultTitle = "Twitter couldn't find anything for your search"
     let emptyResultMessage = "Try searching something else"
+    let nothingToLoadTitle = "We are caught up"
+    let nothingToLoadMessage = "There are no more tweets to load!"
     
     
     
@@ -99,7 +101,7 @@ class TweetsViewController: UIViewController {
         button.addTarget(self, action: #selector(scrollToTop), for: UIControlEvents.touchDown)
         self.navigationController?.navigationBar.addSubview(button)
         
-        updateTableHeaderWith(title: welcomeStatusTitle, message: welcomeStatusMessage)
+        updateTableStatusWith(title: welcomeStatusTitle, message: welcomeStatusMessage, onHeader: true)
     }
     
     
@@ -180,7 +182,7 @@ class TweetsViewController: UIViewController {
     
     
     
-    func updateTableHeaderWith(title:String, message:String) -> Void{
+    func updateTableStatusWith(title:String, message:String, onHeader: Bool) -> Void{
         
         let statusView = UIView(frame: CGRect(x: 0, y: 0, width: searchBar.bounds.width - 15, height: 50))
         statusView.center.x = searchBar.bounds.width/2.0
@@ -201,13 +203,18 @@ class TweetsViewController: UIViewController {
         statusView.addSubview(titleLabel)
         statusView.addSubview(subTitleLabel)
         
-        tableView.tableHeaderView = statusView
+        onHeader ? (tableView.tableHeaderView = statusView):(tableView.tableFooterView = statusView)
     }
+    
     
     
     
     func hideTableHeaderStatusMessage() -> Void {
         tableView.tableHeaderView = nil
+    }
+    
+    func hideTableFooterStatusMessage() -> Void {
+        tableView.tableFooterView = nil
     }
     
     
@@ -453,15 +460,21 @@ extension TweetsViewController: TweetViewModelDelegate{
     func didFinishSearchingWithError(error: AnyObject?) {
         
         if error?.code == NSURLErrorNotConnectedToInternet{
+            updateTableStatusWith(title: offlineStatusTitle, message: offlineStatusMessage, onHeader: true)
             
-            updateTableHeaderWith(title: offlineStatusTitle, message: offlineStatusMessage)
-        }else{
+        }else if error as? fetchError == fetchError.NoNextTweetsURL{
+            hideBottomRefresh()
+            updateTableStatusWith(title: nothingToLoadTitle, message: nothingToLoadMessage, onHeader: false)
+            
+        }
+        else{
             refreshControl.endRefreshing()
             hideBottomRefresh()
             hideTableHeaderStatusMessage()
+            hideTableFooterStatusMessage()
             self.tableView.reloadData()
             if tweetViewModel.sharedAppDelegate.tweets.count == 0{
-                updateTableHeaderWith(title: emptyResultTitle, message: emptyResultMessage)
+                updateTableStatusWith(title: emptyResultTitle, message: emptyResultMessage, onHeader: true)
             }
         }
         
@@ -472,15 +485,21 @@ extension TweetsViewController: TweetViewModelDelegate{
     func didFinishFetchingNextTweetsWithError(error: AnyObject?) {
         
         if error?.code == NSURLErrorNotConnectedToInternet{
+            updateTableStatusWith(title: offlineStatusTitle, message: offlineStatusMessage, onHeader: true)
             
-            updateTableHeaderWith(title: offlineStatusTitle, message: offlineStatusMessage)
+        }else if error as? fetchError == fetchError.NoNextTweetsURL{
+            hideBottomRefresh()
+            updateTableStatusWith(title: nothingToLoadTitle, message: nothingToLoadMessage, onHeader: false)
+            
         }else{
             refreshControl.endRefreshing()
             hideBottomRefresh()
             hideTableHeaderStatusMessage()
+            hideTableFooterStatusMessage()
             self.tableView.reloadData()
+            
             if tweetViewModel.sharedAppDelegate.tweets.count == 0{
-                updateTableHeaderWith(title: emptyResultTitle, message: emptyResultMessage)
+                updateTableStatusWith(title: emptyResultTitle, message: emptyResultMessage, onHeader: true)
             }
         }
         
